@@ -1,0 +1,11 @@
+# Środowisko Pythona - za duże żeby wrzucać na GitHub
+venv/
+__pycache__/
+*.pyc
+
+# Plik z tajnymi danymi - NIGDY nie wrzucaj na GitHub!
+.env
+
+# Pliki systemowe Windows
+Thumbs.db
+desktop.ini
