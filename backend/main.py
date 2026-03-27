@@ -1,9 +1,10 @@
 from fastapi import FastAPI
 from routers import roster
-
+from routers import gildia
 app = FastAPI()
 
 app.include_router(roster.router, prefix="/roster", tags=["Roster"])
+app.include_router(gildia.router, prefix="/gildia", tags=["Gildia"])
 
 @app.get("/")
 async def root():
