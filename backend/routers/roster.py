@@ -1,42 +1,47 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
 from pydantic import BaseModel
 
+from database import get_db
+from models import Czlonek
 router = APIRouter()
 
-class Czlonek(BaseModel):
+class CzlonekSchema(BaseModel):
     imie: str
     klasa: str
     poziom: int
     ranga: str
 
-czlonkowie = [
-    {"imie": "Arthas",   "klasa": "Death Knight", "poziom": 80, "ranga": "Guild Master"},
-    {"imie": "Jaina",    "klasa": "Mage",          "poziom": 80, "ranga": "Officer"},
-    {"imie": "Thrall",   "klasa": "Shaman",        "poziom": 80, "ranga": "Member"},
-    {"imie": "Sylvanas", "klasa": "Hunter",        "poziom": 80, "ranga": "Member"},
-]
-
 @router.get("/")
-async def roster():
+async def roster(db: Session = Depends(get_db)):
+    czlonkowie = db.query(Czlonek).all()
     return czlonkowie
 
-@router.get("/{imie}")
-async def czlonek_po_imieniu(imie: str):
-    for czlonek in czlonkowie:
-        if czlonek["imie"].lower() == imie.lower():
-            return czlonek
-    return {"blad": f"Nie znaleziono gracza {imie}"}
+@router.get("/{czlonek_id}")
+async def czlonek_po_id(czlonek_id: int, db: Session = Depends(get_db)):
+    czlonek = db.query(Czlonek).filter(Czlonek.id == czlonek_id).first()
+    if not czlonek:
+        raise HTTPException(status_code=404, detail="Nie znaleziono gracza")
+    return czlonek
 
 @router.post("/")
-async def dodaj_czlonka(czlonek: Czlonek):
-    nowy = czlonek.model_dump()
-    czlonkowie.append(nowy)
-    return {"message": "Dodano!", "czlonek": nowy}
+async def dodaj_czlonka(dane: CzlonekSchema, db: Session = Depends(get_db)):
+    nowy = Czlonek(
+        imie=dane.imie,
+        klasa=dane.klasa,
+        poziom=dane.poziom,
+        ranga=dane.ranga
+    )
+    db.add(nowy)
+    db.commit()
+    db.refresh(nowy)
+    return nowy
 
-@router.delete("/{imie}")
-async def usun_czlonka(imie: str):
-    for i, czlonek in enumerate(czlonkowie):
-        if czlonek["imie"].lower() == imie.lower():
-            usuniety = czlonkowie.pop(i)
-            return {"message": f"Usunięto {usuniety['imie']}"}
-    return {"blad": f"Nie znaleziono gracza {imie}"}
+@router.delete("/{czlonek_id}")
+async def usun_czlonka(czlonek_id: int, db: Session = Depends(get_db)):
+    czlonek = db.query(Czlonek).filter(Czlonek.id == czlonek_id).first()
+    if not czlonek:
+        raise HTTPException(status_code=404, detail="Nie znaleziono gracza")
+    db.delete(czlonek)
+    db.commit()
+    return {"message": f"Usunieto {czlonek.imie}"}

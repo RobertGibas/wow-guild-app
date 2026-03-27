@@ -1,6 +1,8 @@
 from fastapi import FastAPI
-from routers import roster
-from routers import gildia
+from routers import roster, gildia
+from database import engine, Base
+
+Base.metadata.create_all(bind=engine)
 app = FastAPI()
 
 app.include_router(roster.router, prefix="/roster", tags=["Roster"])
