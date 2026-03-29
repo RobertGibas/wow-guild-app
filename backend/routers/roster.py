@@ -1,9 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
+from routers.auth import get_current_user
 
 from database import get_db
 from models import Czlonek
+
 router = APIRouter()
 
 class CzlonekSchema(BaseModel):
@@ -13,19 +15,29 @@ class CzlonekSchema(BaseModel):
     ranga: str
 
 @router.get("/")
-async def roster(db: Session = Depends(get_db)):
-    czlonkowie = db.query(Czlonek).all()
-    return czlonkowie
+async def roster(
+    db: Session = Depends(get_db),
+    aktualny = Depends(get_current_user)
+):
+    return db.query(Czlonek).all()
 
 @router.get("/{czlonek_id}")
-async def czlonek_po_id(czlonek_id: int, db: Session = Depends(get_db)):
+async def czlonek_po_id(
+    czlonek_id: int, 
+    db: Session = Depends(get_db),
+    aktualny = Depends(get_current_user)
+):
     czlonek = db.query(Czlonek).filter(Czlonek.id == czlonek_id).first()
     if not czlonek:
         raise HTTPException(status_code=404, detail="Nie znaleziono gracza")
     return czlonek
 
 @router.post("/")
-async def dodaj_czlonka(dane: CzlonekSchema, db: Session = Depends(get_db)):
+async def dodaj_czlonka(
+    dane: CzlonekSchema, 
+    db: Session = Depends(get_db),
+    aktualny = Depends(get_current_user)
+):
     nowy = Czlonek(
         imie=dane.imie,
         klasa=dane.klasa,
@@ -38,7 +50,11 @@ async def dodaj_czlonka(dane: CzlonekSchema, db: Session = Depends(get_db)):
     return nowy
 
 @router.delete("/{czlonek_id}")
-async def usun_czlonka(czlonek_id: int, db: Session = Depends(get_db)):
+async def usun_czlonka(
+    czlonek_id: int, 
+    db: Session = Depends(get_db),
+    aktualny = Depends(get_current_user)
+):
     czlonek = db.query(Czlonek).filter(Czlonek.id == czlonek_id).first()
     if not czlonek:
         raise HTTPException(status_code=404, detail="Nie znaleziono gracza")

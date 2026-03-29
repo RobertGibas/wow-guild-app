@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 from datetime import datetime
+from routers.auth import get_current_user
 
 from database import get_db
 from models import Rajd
@@ -26,18 +27,29 @@ class RajdSchema(BaseModel):
     notatki: str = "Nie ma zadnych notatek"
 
 @router.get("/", response_model=list[RajdResponse])
-async def lista_rajdow(db: Session = Depends(get_db)):
+async def lista_rajdow(
+    db: Session = Depends(get_db),
+    aktualny = Depends(get_current_user)
+):
     return db.query(Rajd).all()
 
 @router.get("/{rajd_id}", response_model=RajdResponse)
-async def szczegoly_rajdu(rajd_id: int, db: Session = Depends(get_db)):
+async def szczegoly_rajdu(
+    rajd_id: int, 
+    db: Session = Depends(get_db),
+    aktualny = Depends(get_current_user)
+):
     rajd = db.query(Rajd).filter(Rajd.id == rajd_id).first()
     if not rajd:
         raise HTTPException(status_code=404, detail="nie znaleziono rajdu")
     return rajd
 
 @router.post("/")
-async def dodaj_rajd(dane: RajdSchema, db: Session = Depends(get_db)):
+async def dodaj_rajd(
+    dane: RajdSchema, 
+    db: Session = Depends(get_db),
+    aktualny = Depends(get_current_user)
+):
     nowy = Rajd(
         nazwa=dane.nazwa,
         data=dane.data,
@@ -50,7 +62,12 @@ async def dodaj_rajd(dane: RajdSchema, db: Session = Depends(get_db)):
     return nowy
 
 @router.put("/{rajd_id}")
-async def aktualizuj_rajd(rajd_id: int, dane: RajdSchema, db: Session = Depends(get_db)):
+async def aktualizuj_rajd(
+    rajd_id: int, 
+    dane: RajdSchema, 
+    db: Session = Depends(get_db),
+    aktualny = Depends(get_current_user)
+):
     rajd = db.query(Rajd).filter(Rajd.id == rajd_id).first()
     if not rajd:
         raise HTTPException(status_code=404, detail="nie znaleziono rajdu")
@@ -65,7 +82,11 @@ async def aktualizuj_rajd(rajd_id: int, dane: RajdSchema, db: Session = Depends(
     return rajd
 
 @router.delete("/{rajd_id}")
-async def usun_rajd(rajd_id: int, db: Session = Depends(get_db)):
+async def usun_rajd(
+    rajd_id: int, 
+    db: Session = Depends(get_db),
+    aktualny = Depends(get_current_user)
+):
     rajd = db.query(Rajd).filter(Rajd.id == rajd_id).first()
     if not rajd:
         raise HTTPException(status_code=404, detail="nie znaleziono rajdu")

@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
+from routers.auth import get_current_user
 
 from database import get_db
 from models import UczestnikRajdu, Czlonek, Rajd
@@ -16,7 +17,11 @@ class UczestnikSchema(BaseModel):
 
 
 @router.post("/")
-async def dodaj_uczestnika(dane: UczestnikSchema, db: Session = Depends(get_db)):
+async def dodaj_uczestnika(
+    dane: UczestnikSchema, 
+    db: Session = Depends(get_db),
+    aktualny = Depends(get_current_user)
+):
     czlonek = db.query(Czlonek).filter(Czlonek.id == dane.czlonek_id).first()
     if not czlonek:
         raise HTTPException(status_code=404, detail="nie znalezniono czlonka gildii")
@@ -50,7 +55,11 @@ async def dodaj_uczestnika(dane: UczestnikSchema, db: Session = Depends(get_db))
     }
 
 @router.get("/rajd/{rajd_id}")
-async def uczestnicy_rajdu(rajd_id: int, db: Session = Depends(get_db)):
+async def uczestnicy_rajdu(
+    rajd_id: int, 
+    db: Session = Depends(get_db),
+    aktualny = Depends(get_current_user)
+):
     rajd = db.query(Rajd).filter(Rajd.id == rajd_id).first()
     if not rajd:
         raise HTTPException(status_code=404, detail="nie znalezniono rajdu")
@@ -75,7 +84,11 @@ async def uczestnicy_rajdu(rajd_id: int, db: Session = Depends(get_db)):
     }
 
 @router.get("/czlonek/{czlonek_id}")
-async def rajdy_czlonka(czlonek_id: int, db: Session = Depends(get_db)):
+async def rajdy_czlonka(
+    czlonek_id: int, 
+    db: Session = Depends(get_db),
+    aktualny = Depends(get_current_user)
+):
     czlonek = db.query(Czlonek).filter(Czlonek.id == czlonek_id).first()
     if not czlonek:
         raise HTTPException(status_code=404, detail="nie znaleziono czlonka gildii")
@@ -101,7 +114,11 @@ async def rajdy_czlonka(czlonek_id: int, db: Session = Depends(get_db)):
     }
 
 @router.delete("/{uczestnik_id}")
-async def usun_uczestnika(uczestnik_id: int, db: Session = Depends(get_db)):
+async def usun_uczestnika(
+    uczestnik_id: int, 
+    db: Session = Depends(get_db),
+    aktualny = Depends(get_current_user)
+):
     uczestnik = db.query(UczestnikRajdu).filter(UczestnikRajdu.id == uczestnik_id).first()
     if not uczestnik:
         raise HTTPException(status_code=404, detail="nie znaleziono uczestnika")
