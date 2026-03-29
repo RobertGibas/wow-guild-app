@@ -51,7 +51,7 @@ async def dodaj_rajd(dane: RajdSchema, db: Session = Depends(get_db)):
 
 @router.put("/{rajd_id}")
 async def aktualizuj_rajd(rajd_id: int, dane: RajdSchema, db: Session = Depends(get_db)):
-    rajd = db.query(Rajd).filter(Rajd.id == rajd.id).first()
+    rajd = db.query(Rajd).filter(Rajd.id == rajd_id).first()
     if not rajd:
         raise HTTPException(status_code=404, detail="nie znaleziono rajdu")
     
