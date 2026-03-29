@@ -1,0 +1,15 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+*.pyo
+
+# Baza danych
+*.db
+
+# Tajne dane
+.env
+
+# Windows
+Thumbs.db
+desktop.ini
