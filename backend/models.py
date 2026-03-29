@@ -56,3 +56,17 @@ class Uzytkownik(Base):
     haslo_hash = Column(String, nullable=False)
     jest_adminem = Column(Boolean, default=False)
     aktywny = Column(Boolean, default=True)
+
+class Podanie(Base):
+    __tablename__ = "podania"
+
+    id = Column(Integer, primary_key=True, index=True)
+    imie_postaci = Column(String, nullable=False)
+    klasa_postaci = Column(String, nullable=False)
+    poziom = Column(Integer, nullable=False)
+    doswiadczenie = Column(String, default="")
+    dlaczego_aplikuje = Column(String, default="")
+    kontakt_discord = Column(String, default="")
+    status = Column(String, default="oczekujace")
+    data_zlozenia = Column(DateTime, default=datetime.utcnow)
+    komentarz_oficera = Column(String, default="") 
