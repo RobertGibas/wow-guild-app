@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
-from routers.auth import get_current_user
 
 from database import get_db
 from models import Czlonek
+from core.security import get_current_user,get_admin_user
 
 router = APIRouter()
 
@@ -36,7 +36,7 @@ async def czlonek_po_id(
 async def dodaj_czlonka(
     dane: CzlonekSchema, 
     db: Session = Depends(get_db),
-    aktualny = Depends(get_current_user)
+    aktualny = Depends(get_admin_user)
 ):
     nowy = Czlonek(
         imie=dane.imie,
@@ -53,7 +53,7 @@ async def dodaj_czlonka(
 async def usun_czlonka(
     czlonek_id: int, 
     db: Session = Depends(get_db),
-    aktualny = Depends(get_current_user)
+    aktualny = Depends(get_admin_user)
 ):
     czlonek = db.query(Czlonek).filter(Czlonek.id == czlonek_id).first()
     if not czlonek:

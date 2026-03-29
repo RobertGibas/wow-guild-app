@@ -5,35 +5,15 @@ from pydantic import BaseModel
 
 from database import get_db
 from models import Uzytkownik
-from core.security import zaszyfruj_haslo, sprawdz_haslo, stworz_token, sprawdz_token
+from core.security import zaszyfruj_haslo, sprawdz_haslo, stworz_token, sprawdz_token, oauth2_scheme, get_current_user, get_admin_user
 
 router = APIRouter()
-
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 
 
 class RejestracjaSchema(BaseModel):
     email: str
     nazwa: str
     haslo: str
-
-def get_current_user(
-        token: str = Depends(oauth2_scheme),
-        db: Session = Depends(get_db)
-):
-    payload = sprawdz_token(token)
-    if not payload:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="nieprawidłowy token lub wygasł",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    uzytkownik = db.query(Uzytkownik).filter(
-        Uzytkownik.id == payload.get("id")
-    ).first()
-    if not uzytkownik:
-        raise HTTPException(status_code=404, detail="nie znaleziono uzytkownika")
-    return uzytkownik
 
 @router.post("/rejestracja")
 async def rejestracja(dane: RejestracjaSchema, db: Session = Depends(get_db)):
@@ -76,3 +56,16 @@ async def moje_konto(aktualny: Uzytkownik = Depends(get_current_user)):
         "nazwa": aktualny.nazwa,
         "jest_adminem": aktualny.jest_adminem
     }
+
+@router.put("/nadaj-admina/{uzytkownik_id}")
+async def nadaj_admina(
+    uzytkownik_id: int,
+    db: Session = Depends(get_db),
+    aktualny = Depends(get_admin_user)
+):
+    uzytkownik = db.query(Uzytkownik).filter(Uzytkownik.id == uzytkownik_id).first()
+    if not uzytkownik:
+        raise HTTPException(status_code=404, detail="nie znaleziono uzytkownika")
+    uzytkownik.jest_adminem = True
+    db.commit()
+    return {"message": f"{uzytkownik.nazwa} jest teraz adminem"}

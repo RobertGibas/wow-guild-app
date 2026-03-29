@@ -4,7 +4,13 @@ from passlib.context import CryptContext
 import os
 from dotenv import load_dotenv
 from pathlib import Path
+from fastapi import Depends, HTTPException, status
+from sqlalchemy.orm import Session
+from database import get_db
+from fastapi.security import OAuth2PasswordBearer
+from models import Uzytkownik
 
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 env_path = Path(__file__).parent.parent /".env"
 load_dotenv(dotenv_path=env_path)
 
@@ -32,3 +38,28 @@ def sprawdz_token(token: str) -> dict:
         return payload
     except JWTError:
         return None
+    
+def get_current_user(
+        token: str = Depends(oauth2_scheme),
+        db: Session = Depends(get_db)
+):
+    payload = sprawdz_token(token)
+    if not payload:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            details="nieprawidlowy token lub token wygasl",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    uzytkownik = db.query(Uzytkownik).filter(Uzytkownik.id == payload.get("id")).first()
+    if not uzytkownik:
+        raise HTTPException(status_code=404,detail="nie znaleziono uzytkownika")
+    return uzytkownik
+
+def get_admin_user(aktualny = Depends(get_current_user)):
+    if not aktualny.jest_adminem:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="brak uprawnien - tylko oficerowie maja dostep"
+        )
+    return aktualny
+    
