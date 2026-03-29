@@ -46,3 +46,13 @@ class UczestnikRajdu(Base):
 
     czlonek = relationship("Czlonek", back_populates="uczestnictwa")
     rajd = relationship("Rajd", back_populates="uczestnicy")
+
+class Uzytkownik(Base):
+    __tablename__ = "uzytkownicy"
+
+    id = Column(Integer, primary_key=True, index=True)
+    email = Column(String, unique=True, nullable=False)
+    nazwa = Column(String, nullable=False)
+    haslo_hash = Column(String, nullable=False)
+    jest_adminem = Column(Boolean, default=False)
+    aktywny = Column(Boolean, default=True)

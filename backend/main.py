@@ -1,10 +1,11 @@
 from fastapi import FastAPI
-from routers import roster, gildia, rajdy, kalendarz, blizzard, uczestnicy
+from routers import roster, gildia, rajdy, kalendarz, blizzard, uczestnicy, auth
 from database import engine, Base
 
 Base.metadata.create_all(bind=engine)
 app = FastAPI()
 
+app.include_router(auth.router, prefix="/auth", tags=["Autoryzacja"])
 app.include_router(roster.router, prefix="/roster", tags=["Roster"])
 app.include_router(gildia.router, prefix="/gildia", tags=["Gildia"])
 app.include_router(rajdy.router, prefix="/rajdy", tags=["Rajdy"])
