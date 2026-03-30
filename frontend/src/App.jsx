@@ -1,10 +1,10 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import Login from './pages/Login'
 import Roster from './pages/Roster'
 import Rajdy from './pages/Rajdy'
 import Kalendarz from './pages/Kalendarz'
 
-function PrivateRoute({children}){
+function PrivateRoute({ children }) {
   const token = localStorage.getItem('token')
   return token ? children : <Navigate to="/login" />
 }
