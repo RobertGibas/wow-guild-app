@@ -47,7 +47,7 @@ def get_current_user(
     if not payload:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            details="nieprawidlowy token lub token wygasl",
+            detail="nieprawidlowy token lub token wygasl",
             headers={"WWW-Authenticate": "Bearer"},
         )
     uzytkownik = db.query(Uzytkownik).filter(Uzytkownik.id == payload.get("id")).first()
