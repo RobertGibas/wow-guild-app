@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import api from '../api/axios'
+import Navbar from '../components/Navbar'
 
 export default function Roster(){
     const [czlonkowie, setCzlonkowie] = useState([])
@@ -32,11 +33,6 @@ export default function Roster(){
     }
   }
 
-    function wyloguj() {
-        localStorage.removeItem('token')
-        navigate('/login')
-    }
-
     const rangiKolory = {
         'Guild Master': '#e2b96f',
         'Officer': '#a78bfa',
@@ -46,37 +42,37 @@ export default function Roster(){
     if (ladowanie) return <p style={styles.info}>Ładowanie...</p>
     if (blad) return <p style={styles.blad}>{blad}</p>
 
-    return (
-        <div style={styles.container}>
-            <div style={styles.header}>
-                <h1 style={styles.title}>Roster Gildii</h1>
-                <button style={styles.wyloguj} onClick={wyloguj}>
-                    Wyloguj
-                </button>
+     return (
+    <div style={styles.strona}>
+      <Navbar />
+      <div style={styles.container}>
+        <h1 style={styles.title}>Roster Gildii</h1>
+        <p style={styles.liczba}>Członkowie: {czlonkowie.length}</p>
+        <div style={styles.grid}>
+          {czlonkowie.map((czlonek) => (
+            <div key={czlonek.id} style={styles.karta}>
+              <h3 style={styles.imie}>{czlonek.imie}</h3>
+              <p style={styles.klasa}>{czlonek.klasa}</p>
+              <p style={styles.poziom}>Poziom {czlonek.poziom}</p>
+              <span style={{
+                ...styles.ranga,
+                backgroundColor: rangiKolory[czlonek.ranga] || '#888',
+              }}>
+                {czlonek.ranga}
+              </span>
             </div>
-
-            <p style={styles.liczba}>Członkowie: {czlonkowie.length}</p>
-
-            <div style={styles.grid}>
-                {czlonkowie.map((czlonek) => (
-                    <div key={czlonek.id} style={styles.karta}>
-                        <h3 style={styles.imie}>{czlonek.imie}</h3>
-                        <p style={styles.klasa}>{czlonek.klasa}</p>
-                        <p style={styles.poziom}>Poziom{czlonek.poziom}</p>
-                        <span style={{
-                            ...styles.ranga,
-                            backgroundColor: rangiKolory[czlonek.ranga] || '#888'
-                        }}>
-                            {czlonek.ranga}
-                        </span>
-                        </div>
-                ))}
-            </div>
+          ))}
         </div>
-    )
+      </div>
+    </div>
+  )
 }
-
 const styles = {
+    strona: {
+    minHeight: 
+    '100vh', 
+    backgroundColor: '#1a1a2e' 
+  },
     container: {
     minHeight: '100vh',
     backgroundColor: '#1a1a2e',
@@ -91,14 +87,6 @@ const styles = {
   title: {
     color: '#e2b96f',
     fontSize: '28px',
-  },
-  wyloguj: {
-    padding: '8px 16px',
-    backgroundColor: 'transparent',
-    border: '1px solid #e2b96f',
-    borderRadius: '8px',
-    color: '#e2b96f',
-    cursor: 'pointer',
   },
    liczba: {
     color: '#888',
