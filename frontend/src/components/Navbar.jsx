@@ -9,7 +9,8 @@ export default function Navbar() {
         navigate('/login')
     }
     const linki = [
-        {path: '/roster', label:'Roster' },
+      { path: '/dashboard', label: 'Dashboard'},
+        {path: '/roster', label:'Roster'},
         {path: '/rajdy', label:'Rajdy'},
         {path: '/kalendarz', label:'Kalendarz'},
     ]

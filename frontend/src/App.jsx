@@ -3,6 +3,7 @@ import Login from './pages/Login'
 import Roster from './pages/Roster'
 import Rajdy from './pages/Rajdy'
 import Kalendarz from './pages/Kalendarz'
+import Dashboard from './pages/DashBoard'
 
 function PrivateRoute({ children }) {
   const token = localStorage.getItem('token')
@@ -14,6 +15,9 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<Login />} />
+        <Route path="/dashboard" element={
+          <PrivateRoute><Dashboard /></PrivateRoute>
+        } />
         <Route path="/roster" element={
           <PrivateRoute><Roster /></PrivateRoute>
         } />
@@ -24,6 +28,7 @@ export default function App() {
           <PrivateRoute><Kalendarz /></PrivateRoute>
         } />
         <Route path="/" element={<Navigate to="/roster" />} />
+        <Route path="/" element={<Navigate to="/dashboard" />} />
       </Routes>
     </BrowserRouter>
   )
