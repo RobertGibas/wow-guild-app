@@ -3,10 +3,31 @@ import { useNavigate } from 'react-router-dom'
 import api from '../api/axios'
 import Navbar from '../components/Navbar'
 
+const KLASY_KOLORY = {
+  'Death Knight': '#C41E3A',
+  'Demon Hunter': '#A330C9',
+  'Druid':        '#FF7C0A',
+  'Hunter':       '#AAD372',
+  'Mage':         '#3FC7EB',
+  'Monk':         '#00FF98',
+  'Paladin':      '#F48CBA',
+  'Priest':       '#FFFFFF',
+  'Rogue':        '#FFF468',
+  'Shaman':       '#0070DD',
+  'Warlock':      '#8788EE',
+  'Warrior':      '#C69B3A',
+}
+
+const RANGI_KOLORY = {
+        'Guild Master': '#e2b96f',
+        'Officer': '#a78bfa',
+        'Member': '#6ee7b7',
+}
+
 export default function Roster(){
     const [czlonkowie, setCzlonkowie] = useState([])
     const [ladowanie, setLadowanie] = useState(true)
-    const [blad, setBlad] = useState('')
+    const [szukaj, setSzukaj] = useState('')
     const navigate = useNavigate()
 
     useEffect(() => {
@@ -25,106 +46,81 @@ export default function Roster(){
     } catch (err) {
       if (err.response?.status === 401) {
         navigate('/login')
-      } else {
-        setBlad('Błąd pobierania danych')
-      }
-    } finally {
+      }} 
+      finally {
       setLadowanie(false)
     }
   }
-
-    const rangiKolory = {
-        'Guild Master': '#e2b96f',
-        'Officer': '#a78bfa',
-        'Member': '#6ee7b7',
-    }
-
-    if (ladowanie) return <p style={styles.info}>Ładowanie...</p>
-    if (blad) return <p style={styles.blad}>{blad}</p>
+    const przefiltrowane = czlonkowie.filter(c =>
+    c.imie.toLowerCase().includes(szukaj.toLowerCase()) ||
+    c.klasa.toLowerCase().includes(szukaj.toLowerCase())
+  )
 
      return (
     <div style={styles.strona}>
       <Navbar />
       <div style={styles.container}>
-        <h1 style={styles.title}>Roster Gildii</h1>
-        <p style={styles.liczba}>Członkowie: {czlonkowie.length}</p>
-        <div style={styles.grid}>
-          {czlonkowie.map((czlonek) => (
-            <div key={czlonek.id} style={styles.karta}>
-              <h3 style={styles.imie}>{czlonek.imie}</h3>
-              <p style={styles.klasa}>{czlonek.klasa}</p>
-              <p style={styles.poziom}>Poziom {czlonek.poziom}</p>
-              <span style={{
-                ...styles.ranga,
-                backgroundColor: rangiKolory[czlonek.ranga] || '#888',
-              }}>
-                {czlonek.ranga}
-              </span>
-            </div>
-          ))}
+
+        <div style={styles.naglowek}>
+          <div>
+            <h1 style={styles.tytul}>Roster Gildii</h1>
+            <p style={styles.podtytul}>{czlonkowie.length} członków</p>
+          </div>
+          <input
+            style={styles.szukaj}
+            placeholder="🔍 Szukaj gracza lub klasy..."
+            value={szukaj}
+            onChange={(e) => setSzukaj(e.target.value)}
+          />
         </div>
+
+        {ladowanie ? (
+          <p style={styles.info}>Ładowanie...</p>
+        ) : (
+          <div style={styles.grid}>
+            {przefiltrowane.map((czlonek) => (
+              <div key={czlonek.id} style={styles.karta}>
+                <div style={styles.kartaGora}>
+                  <div style={{
+                    ...styles.klasaKropka,
+                    backgroundColor: KLASY_KOLORY[czlonek.klasa] || '#888'
+                  }}/>
+                  <span style={styles.klasa}>{czlonek.klasa}</span>
+                </div>
+                <h3 style={styles.imie}>{czlonek.imie}</h3>
+                <div style={styles.kartaDol}>
+                  <span style={styles.poziom}>Poziom {czlonek.poziom}</span>
+                  <span style={{
+                    ...styles.ranga,
+                    color: RANGI_KOLORY[czlonek.ranga] || '#888',
+                    borderColor: RANGI_KOLORY[czlonek.ranga] || '#888',
+                  }}>
+                    {czlonek.ranga}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   )
 }
 const styles = {
-    strona: {
-    minHeight: 
-    '100vh', 
-    backgroundColor: '#1a1a2e' 
-  },
-    container: {
-    minHeight: '100vh',
-    backgroundColor: '#1a1a2e',
-    padding: '24px',
-  },
-  header: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: '8px',
-  },
-  title: {
-    color: '#e2b96f',
-    fontSize: '28px',
-  },
-   liczba: {
-    color: '#888',
-    marginBottom: '24px',
-  },
-  grid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
-    gap: '16px',
-  },
-  karta: {
-    backgroundColor: '#16213e',
-    padding: '20px',
-    borderRadius: '12px',
-    border: '1px solid #0f3460',
-  },
-  imie: {
-    color: '#fff',
-    marginBottom: '4px',
-    fontSize: '18px',
-  },
-  klasa: {
-    color: '#a78bfa',
-    marginBottom: '4px',
-    fontSize: '14px',
-  },
-  poziom: {
-    color: '#888',
-    fontSize: '13px',
-    marginBottom: '12px',
-  },
-   ranga: {
-    padding: '4px 10px',
-    borderRadius: '20px',
-    fontSize: '12px',
-    color: '#1a1a2e',
-    fontWeight: 'bold',
-  },
-  info: { color: '#888', padding: '24px' },
-  blad: { color: '#ff6b6b', padding: '24px' },
+  strona:    { minHeight: '100vh', backgroundColor: '#0d1117' },
+  container: { padding: '24px', maxWidth: '1200px', margin: '0 auto' },
+  naglowek:  { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' },
+  tytul:     { color: '#e6edf3', fontSize: '26px', fontWeight: 'bold' },
+  podtytul:  { color: '#8b949e', fontSize: '14px', marginTop: '4px' },
+  szukaj:    { padding: '10px 16px', backgroundColor: '#21262d', border: '1px solid #30363d', borderRadius: '8px', color: '#e6edf3', fontSize: '14px', width: '280px', outline: 'none' },
+  grid:      { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '16px' },
+  karta:     { backgroundColor: '#161b22', border: '1px solid #30363d', borderRadius: '12px', padding: '20px', transition: 'border-color 0.2s' },
+  kartaGora: { display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' },
+  klasaKropka: { width: '10px', height: '10px', borderRadius: '50%' },
+  klasa:     { color: '#8b949e', fontSize: '13px' },
+  imie:      { color: '#e6edf3', fontSize: '18px', fontWeight: 'bold', marginBottom: '16px' },
+  kartaDol:  { display: 'flex', justifyContent: 'space-between', alignItems: 'center' },
+  poziom:    { color: '#8b949e', fontSize: '13px' },
+  ranga:     { fontSize: '12px', border: '1px solid', borderRadius: '20px', padding: '3px 10px' },
+  info:      { color: '#8b949e', textAlign: 'center', padding: '48px' },
 }

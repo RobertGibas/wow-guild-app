@@ -14,28 +14,35 @@ export default function Navbar() {
         {path: '/kalendarz', label:'Kalendarz'},
     ]
 
-    return(
-        <nav style={styles.nav}>
-            <span style={styles.logo}>Guild App</span>
-            <div style={styles.linki}>
-                {linki.map((link)=> (
-                <button 
-                    key={link.path}
-                    onClick={() => navigate(link.path)}
-                    style={{
-                        ...styles.link,
-                        ...(location.pathname === link.path ? styles.aktywny : {})
-                    }}
-                >
-                    {link.label}
-                </button>
-                ))}
-            </div>
-            <button style={styles.wyloguj} onClick={wyloguj}>
-                Wyloguj
+    return (
+    <nav style={styles.nav}>
+      <div style={styles.logo}>
+        <span style={styles.logoTekst}>Guild Manager</span>
+      </div>
+
+      <div style={styles.linki}>
+        {linki.map((link) => {
+          const aktywny = location.pathname === link.path
+          return (
+            <button
+              key={link.path}
+              onClick={() => navigate(link.path)}
+              style={{
+                ...styles.link,
+                ...(aktywny ? styles.linkAktywny : {})
+              }}
+            >
+              <span>{link.label}</span>
             </button>
-        </nav>
-    )
+          )
+        })}
+      </div>
+
+      <button style={styles.wyloguj} onClick={wyloguj}>
+        Wyloguj
+      </button>
+    </nav>
+  )
 }
 
 const styles = {
@@ -43,39 +50,57 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: '12px 24px',
-    backgroundColor: '#16213e',
-    borderBottom: '1px solid #0f3460',
+    padding: '0 24px',
+    height: '60px',
+    backgroundColor: '#161b22',
+    borderBottom: '1px solid #30363d',
+    position: 'sticky',
+    top: 0,
+    zIndex: 100,
   },
   logo: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px',
+  },
+  logoIkona: {
+    fontSize: '22px',
+  },
+  logoTekst: {
     color: '#e2b96f',
-    fontSize: '18px',
+    fontSize: '16px',
     fontWeight: 'bold',
+    letterSpacing: '0.5px',
   },
   linki: {
     display: 'flex',
-    gap: '8px',
+    gap: '4px',
   },
   link: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '6px',
     padding: '8px 16px',
     backgroundColor: 'transparent',
     border: '1px solid transparent',
     borderRadius: '8px',
-    color: '#888',
+    color: '#8b949e',
     cursor: 'pointer',
     fontSize: '14px',
+    transition: 'all 0.2s',
   },
-  aktywny: {
+  linkAktywny: {
     color: '#e2b96f',
-    border: '1px solid #e2b96f',
+    backgroundColor: '#21262d',
+    border: '1px solid #30363d',
   },
   wyloguj: {
-    padding: '8px 16px',
+    padding: '7px 16px',
     backgroundColor: 'transparent',
-    border: '1px solid #ff6b6b',
+    border: '1px solid #f85149',
     borderRadius: '8px',
-    color: '#ff6b6b',
+    color: '#f85149',
     cursor: 'pointer',
-    fontSize: '14px',
+    fontSize: '13px',
   },
 }

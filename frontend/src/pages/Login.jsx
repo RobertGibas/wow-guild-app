@@ -6,17 +6,17 @@ export default function Login(){
     const [email, setEmail] = useState('')
     const [haslo, setHaslo] = useState('')
     const [blad, setBlad] = useState('')
+    const [laduje, setLaduje] = useState(false)
     const navigate = useNavigate()
 
     async function handleLogin(e) {
         e.preventDefault()
         setBlad('')
-
+        setLaduje(true)
         try {
             const params = new URLSearchParams()
             params.append('username', email)
             params.append('password', haslo)
-
             const response = await api.post('/auth/login', params, {
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
@@ -30,106 +30,125 @@ export default function Login(){
             console.log('Status:', err.response?.status)
             console.log('Dane błędu:', err.response?.data)
             setBlad('Nieprawidłowy email lub hasło')
+        }finally {
+            setLaduje(false)
         }
     }
-    return(
-        <div style={styles.container}>
-            <div style={styles.card}>
-                <h1 style={styles.title}>WoWGuildApp</h1>
-                <p style={styles.subtitle}>zaloguj się aby kontynuować</p>
-
-                <form onSubmit={handleLogin}>
-                    <div style={styles.field}>
-                        <label style={styles.label}>Email</label>
-                        <input
-                        style={styles.input}
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        placeholder="gracz@wow.pl"
-                        required
-                        />
-                    </div>
-
-                    <div style={styles.field}>
-                        <label style={styles.label}>Hasło</label>
-                        <input
-                        style={styles.input}
-                        type="password"
-                        value={haslo}
-                        onChange={(e) => setHaslo(e.target.value)}
-                        placeholder="••••••••"
-                        required
-                        />
-                    </div>
-
-                    {blad && <p style={styles.blad}>{blad}</p>}
-
-                    <button style={styles.button} type="submit">
-                        Zaloguj się
-                    </button>
-                </form>
-            </div>
+     return (
+    <div style={styles.strona}>
+      <div style={styles.karta}>
+        <div style={styles.naglowek}>
+          <h1 style={styles.tytul}>Guild Manager</h1>
+          <p style={styles.podtytul}>Zaloguj się do panelu gildii</p>
         </div>
-    )
+
+        <form onSubmit={handleLogin}>
+          <div style={styles.pole}>
+            <label style={styles.label}>Email</label>
+            <input
+              style={styles.input}
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="gracz@wow.pl"
+              required
+            />
+          </div>
+
+          <div style={styles.pole}>
+            <label style={styles.label}>Hasło</label>
+            <input
+              style={styles.input}
+              type="password"
+              value={haslo}
+              onChange={(e) => setHaslo(e.target.value)}
+              placeholder="••••••••"
+              required
+            />
+          </div>
+          <button style={styles.przycisk} type="submit" disabled={laduje}>
+            {laduje ? 'Logowanie...' : 'Zaloguj się'}
+          </button>
+        </form>
+      </div>
+    </div>
+  )
 }
 
 const styles = {
-    container: {
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: '#1a1a2e',
-    },
-    card: {
-        backgroundColor: '#16213e',
-        padding: '40px',
-        borderRadius: '12px',
-        width: '100%',
-        maxWidth: '400px',
-        border: '1px solid #0f3460',
-    },
-    title: {
-        color: '#e2b96f',
-        textAlign: 'center',
-        marginBottom: '8px',
-        fontSize: '24px',
-    },
-    subtitle: {
-        color: '#888',
-        textAlign: 'center',
-        marginBottom: '32px',
-    },
-    field: {
-        marginBottom: '16px',
-    },
-    label: {
-        display: 'block',
-        color: '#ccc',
-        marginBottom: '6px',
-        fontSize: '14px',
-    },
-    input: {
-        width: '100%',
-        padding: '10px 14px',
-        backgroundColor: '#0f3460',
-        border: '1px solid #1a4a7a',
-        borderRadius: '8px',
-        color: '#fff',
-        fontSize: '14px',
-        boxSizing: 'border-box',
-    },
-    button: {
-        width: '100%',
-        padding: '12px',
-        backgroundColor: '#e2b96f',
-        color: '#1a1a2e',
-        border: 'none',
-        borderRadius: '8px',
-        fontSize: '16px',
-        fontWeigth: 'bold',
-        cursor: 'pointer',
-        marginTop: '8px',
-    },
+  strona: {
+    minHeight: '100vh',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#0d1117',
+    padding: '24px',
+  },
+  karta: {
+    width: '100%',
+    maxWidth: '400px',
+    backgroundColor: '#161b22',
+    border: '1px solid #30363d',
+    borderRadius: '16px',
+    padding: '40px',
+  },
+  naglowek: {
+    textAlign: 'center',
+    marginBottom: '32px',
+  },
+  ikona: {
+    fontSize: '48px',
+    marginBottom: '12px',
+  },
+  tytul: {
+    color: '#e2b96f',
+    fontSize: '24px',
+    fontWeight: 'bold',
+    marginBottom: '8px',
+  },
+  podtytul: {
+    color: '#8b949e',
+    fontSize: '14px',
+  },
+  pole: {
+    marginBottom: '16px',
+  },
+  label: {
+    display: 'block',
+    color: '#8b949e',
+    fontSize: '13px',
+    marginBottom: '6px',
+    fontWeight: '500',
+  },
+  input: {
+    width: '100%',
+    padding: '10px 14px',
+    backgroundColor: '#21262d',
+    border: '1px solid #30363d',
+    borderRadius: '8px',
+    color: '#e6edf3',
+    fontSize: '14px',
+    outline: 'none',
+  },
+  blad: {
+    backgroundColor: '#2d1b1b',
+    border: '1px solid #f85149',
+    borderRadius: '8px',
+    color: '#f85149',
+    padding: '10px 14px',
+    fontSize: '13px',
+    marginBottom: '16px',
+  },
+  przycisk: {
+    width: '100%',
+    padding: '12px',
+    backgroundColor: '#e2b96f',
+    color: '#0d1117',
+    border: 'none',
+    borderRadius: '8px',
+    fontSize: '15px',
+    fontWeight: 'bold',
+    cursor: 'pointer',
+    marginTop: '8px',
+  },
 }
