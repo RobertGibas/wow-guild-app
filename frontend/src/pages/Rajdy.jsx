@@ -132,7 +132,9 @@ export default function Rajdy() {
                   }}/>
                   <div>
                     <h3 style={styles.nazwa}>{rajd.nazwa}</h3>
-                    <p style={styles.data}>{rajd.data ? rajd.data.split('T')[0] + ' ' + rajd.data.split('T')[1]?.substring(0, 5) : ''}</p>
+                    <p style={styles.data}>
+                    {rajd.data ? rajd.data.split('T')[0] + ' ' + rajd.data.split('T')[1]?.substring(0, 5) : ''}
+                    </p>
                     {rajd.notatki && (
                       <p style={styles.notatki}>{rajd.notatki}</p>
                     )}
